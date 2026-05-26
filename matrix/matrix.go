@@ -47,8 +47,9 @@ func InitMatrix(config config.MatrixConfig) {
 	syncStopWait.Add(1)
 
 	go func() {
-		err = client.SyncWithContext(syncCtx)
 		defer syncStopWait.Done()
+
+		err = client.SyncWithContext(syncCtx)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			panic(err)
 		}
@@ -57,7 +58,7 @@ func InitMatrix(config config.MatrixConfig) {
 	util.OnSignal(func() {
 		cancelSync()
 		syncStopWait.Wait()
-	}, syscall.SIGTERM)
+	}, syscall.SIGTERM, syscall.SIGINT)
 }
 
 func registerEvents(syncer *mautrix.DefaultSyncer, rooms []config.MatrixRoom) {
