@@ -1,3 +1,2 @@
-[{{ .Hostname }}] **{{ .Subject }}**
-
+{{ if .Hostname }}[{{ .Hostname }}] {{ end }}**{{ .Subject }}**
 {{ .Body }}

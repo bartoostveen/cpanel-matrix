@@ -1,3 +1,5 @@
-<span>[<span data-mx-color="#66ba41">{{ .Hostname }}</span>] <strong data-md="**">{{ .Subject }}</strong></span>
+<span>{{ if .Hostname }}[<span data-mx-color="#66ba41">{{ .Hostname }}</span>] {{ end }}<strong data-md="**">{{ .Subject }}</strong></span>
+
+<br />
 
 <span>{{ .Body }}</span>
