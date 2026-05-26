@@ -1,0 +1,12 @@
+/.envrc
+/.direnv
+/result*
+/repl-result*
+
+.idea/
+.gopath/
+/cpanel-matrix
+*.env
+!.env.example
+config.yaml
+sync_state.json

@@ -1,0 +1,122 @@
+package matrix
+
+import (
+	"bytes"
+	"embed"
+	"errors"
+	htmlTemplate "html/template"
+	"sync"
+	"syscall"
+	textTemplate "text/template"
+
+	"bartoostveen.nl/cpanel-matrix/config"
+	"bartoostveen.nl/cpanel-matrix/util"
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
+	"golang.org/x/net/context"
+	"maunium.net/go/mautrix"
+	"maunium.net/go/mautrix/event"
+	"maunium.net/go/mautrix/id"
+)
+
+//go:embed templates/*
+var templateFS embed.FS
+
+var (
+	htmlTemplates = htmlTemplate.Must(htmlTemplate.ParseFS(templateFS, "templates/*.html"))
+	textTemplates = textTemplate.Must(textTemplate.ParseFS(templateFS, "templates/*.txt"))
+
+	client *mautrix.Client
+	ctx    = context.Background()
+)
+
+func InitMatrix(config config.MatrixConfig) {
+	var err error
+	client, err = mautrix.NewClient(config.HomeserverURL, id.UserID(config.MxID), config.AccessToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client.Store = NewDefaultFileSyncStore()
+
+	syncer := client.Syncer.(*mautrix.DefaultSyncer)
+	registerEvents(syncer, util.KeysOf(config.Rooms))
+
+	syncCtx, cancelSync := context.WithCancel(ctx)
+	var syncStopWait sync.WaitGroup
+	syncStopWait.Add(1)
+
+	go func() {
+		err = client.SyncWithContext(syncCtx)
+		defer syncStopWait.Done()
+		if err != nil && !errors.Is(err, context.Canceled) {
+			panic(err)
+		}
+	}()
+
+	util.OnSignal(func() {
+		cancelSync()
+		syncStopWait.Wait()
+	}, syscall.SIGTERM)
+}
+
+func registerEvents(syncer *mautrix.DefaultSyncer, rooms []string) {
+	syncer.OnEventType(event.StateMember, func(ctx context.Context, evt *event.Event) {
+		if evt.GetStateKey() != client.UserID.String() ||
+			evt.Content.AsMember().Membership != event.MembershipInvite ||
+			slices.Contains(rooms, evt.RoomID.String()) {
+			return
+		}
+
+		_, err := client.JoinRoomByID(ctx, evt.RoomID)
+		if err != nil {
+			log.WithError(err).Warn("cloud not join room %s", evt.RoomID)
+		}
+	})
+}
+
+type RenderRequest struct {
+	Subject  string
+	Hostname string
+	Body     string
+}
+
+func renderMatrixMessage(subject string, hostname string, body string) (err error, plain string, formatted string) {
+	req := RenderRequest{
+		Subject:  subject,
+		Hostname: hostname,
+		Body:     body,
+	}
+
+	var plainResult bytes.Buffer
+	if err = textTemplates.ExecuteTemplate(&plainResult, "message.txt", req); err != nil {
+		return
+	}
+
+	var formattedResult bytes.Buffer
+	if err = htmlTemplates.ExecuteTemplate(&formattedResult, "message.html", req); err != nil {
+		return
+	}
+
+	plain = plainResult.String()
+	formatted = formattedResult.String()
+	return
+}
+
+func SendMatrixMessage(room string, subject string, hostname string, body string) {
+	err, plain, formatted := renderMatrixMessage(subject, hostname, body)
+	if err != nil {
+		log.WithError(err).Warn("Could not render message for Matrix!")
+		return
+	}
+
+	_, err = client.SendMessageEvent(ctx, id.RoomID(room), event.EventMessage, &event.MessageEventContent{
+		MsgType:       event.MsgNotice,
+		Body:          plain,
+		FormattedBody: formatted,
+	})
+
+	if err != nil {
+		log.WithError(err).Warn("Could not deliver message to Matrix!")
+	}
+}
