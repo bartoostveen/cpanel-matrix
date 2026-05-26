@@ -62,18 +62,24 @@ func InitMatrix(config config.MatrixConfig) {
 
 func registerEvents(syncer *mautrix.DefaultSyncer, rooms []config.MatrixRoom) {
 	syncer.OnEventType(event.StateMember, func(ctx context.Context, evt *event.Event) {
+		roomID := evt.RoomID.String()
+		log.Infof("Got asked to join room %s", roomID)
+
 		if evt.GetStateKey() != client.UserID.String() ||
 			evt.Content.AsMember().Membership != event.MembershipInvite ||
 			slices.ContainsFunc(rooms, func(room config.MatrixRoom) bool {
-				return room.ID == evt.RoomID.String()
+				return room.ID == roomID
 			}) {
 			return
 		}
 
+		log.Infof("Joining room %s", roomID)
 		_, err := client.JoinRoomByID(ctx, evt.RoomID)
 		if err != nil {
-			log.WithError(err).Warn("cloud not join room %s", evt.RoomID)
+			log.WithError(err).Warn("could not join room %s", evt.RoomID)
+			return
 		}
+		log.Infof("Joined room %s", roomID)
 	})
 }
 
