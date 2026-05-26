@@ -68,7 +68,7 @@ func registerEvents(syncer *mautrix.DefaultSyncer, rooms []config.MatrixRoom) {
 
 		if evt.GetStateKey() != client.UserID.String() ||
 			evt.Content.AsMember().Membership != event.MembershipInvite ||
-			slices.ContainsFunc(rooms, func(room config.MatrixRoom) bool {
+			!slices.ContainsFunc(rooms, func(room config.MatrixRoom) bool {
 				return room.ID == roomID
 			}) {
 			return
