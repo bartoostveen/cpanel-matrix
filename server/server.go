@@ -55,8 +55,14 @@ func createHookHandler(appConfig config.AppConfig) func(http.ResponseWriter, *ht
 		}
 		token := appConfig.Matrix.Rooms[otherRoomID].Token
 
+		err := request.ParseForm()
+		if err != nil {
+			handleBadRequestError(writer, err, "could not parse form")
+			return
+		}
+
 		var parsedRequest WebhookRequest
-		err := mapstructure.Decode(request.Form, &parsedRequest)
+		err = mapstructure.Decode(request.Form, &parsedRequest)
 		if err != nil {
 			handleBadRequestError(writer, err, "failed to parse webhook request")
 			return
@@ -67,14 +73,16 @@ func createHookHandler(appConfig config.AppConfig) func(http.ResponseWriter, *ht
 			return
 		}
 
-		if len(parsedRequest.Subject) != len(parsedRequest.Body) || len(parsedRequest.Subject) != len(parsedRequest.Hostname) {
-			http.Error(writer, "invalid form data: amount of occurrences of distinct fields must match", 400)
+		if len(parsedRequest.Subject) < 1 || len(parsedRequest.Body) < 1 {
+			http.Error(writer, "invalid form data", 400)
 			return
 		}
 
-		for i := 0; i < len(parsedRequest.Subject); i++ {
-			matrix.SendMatrixMessage(room, parsedRequest.Subject[i], parsedRequest.Hostname[i], parsedRequest.Body[i])
+		hostname := ""
+		if len(parsedRequest.Hostname) >= 1 {
+			hostname = parsedRequest.Hostname[0]
 		}
+		matrix.SendMatrixMessage(room, parsedRequest.Subject[0], hostname, parsedRequest.Body[0])
 	}
 }
 
