@@ -15,10 +15,15 @@ type AppConfig struct {
 }
 
 type MatrixConfig struct {
-	HomeserverURL string            `mapstructure:"homeserver_url"`
-	AccessToken   string            `mapstructure:"access_token"`
-	MxID          string            `mapstructure:"mx_id"`
-	Rooms         map[string]string `mapstructure:"rooms"` // room ID to token for particular room (TODO: improve?)
+	HomeserverURL string       `mapstructure:"homeserver_url"`
+	AccessToken   string       `mapstructure:"access_token"`
+	MxID          string       `mapstructure:"mx_id"`
+	Rooms         []MatrixRoom `mapstructure:"rooms"`
+}
+
+type MatrixRoom struct {
+	ID    string `mapstructure:"id"`
+	Token string `mapstructure:"token"`
 }
 
 func Load() (error, AppConfig) {

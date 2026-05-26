@@ -15,11 +15,12 @@ Pass the path to the config file (if any), using the `-c` flag, defaults to `con
 ```yaml
 port: 8080
 matrix:
-  homeserver_url: https://matrix.example.com/
+  homeserver_url: "https://matrix.example.com/"
   access_token: verysecrettoken
-  mx_id: @bot:example.com
+  mx_id: ""@bot:example.com"
   rooms:
-    "!roomidhere": "token, generate one using pwgen or a similar tool"
+    - id: "!roomidhere"
+      token: "supersecrettoken"
 ```
 
 ### Environment variables

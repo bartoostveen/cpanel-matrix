@@ -40,7 +40,7 @@ func InitMatrix(config config.MatrixConfig) {
 	client.Store = NewDefaultFileSyncStore()
 
 	syncer := client.Syncer.(*mautrix.DefaultSyncer)
-	registerEvents(syncer, util.KeysOf(config.Rooms))
+	registerEvents(syncer, config.Rooms)
 
 	syncCtx, cancelSync := context.WithCancel(ctx)
 	var syncStopWait sync.WaitGroup
@@ -60,11 +60,13 @@ func InitMatrix(config config.MatrixConfig) {
 	}, syscall.SIGTERM)
 }
 
-func registerEvents(syncer *mautrix.DefaultSyncer, rooms []string) {
+func registerEvents(syncer *mautrix.DefaultSyncer, rooms []config.MatrixRoom) {
 	syncer.OnEventType(event.StateMember, func(ctx context.Context, evt *event.Event) {
 		if evt.GetStateKey() != client.UserID.String() ||
 			evt.Content.AsMember().Membership != event.MembershipInvite ||
-			slices.Contains(rooms, evt.RoomID.String()) {
+			slices.ContainsFunc(rooms, func(room config.MatrixRoom) bool {
+				return room.ID == evt.RoomID.String()
+			}) {
 			return
 		}
 

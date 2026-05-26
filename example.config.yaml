@@ -4,4 +4,5 @@ matrix:
   access_token: verysecrettoken
   mx_id: "@bot:example.com"
   rooms:
-    "!roomidhere": "token, generate one using pwgen or a similar tool"
+    - id: "!roomidhere"
+      token: "supersecrettoken"

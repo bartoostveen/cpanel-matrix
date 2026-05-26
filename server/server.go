@@ -11,6 +11,7 @@ import (
 	"bartoostveen.nl/cpanel-matrix/matrix"
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 type WebhookRequest struct {
@@ -32,7 +33,7 @@ func Run(config config.AppConfig) {
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), mux))
 }
 
-func createHookHandler(config config.AppConfig) func(http.ResponseWriter, *http.Request) {
+func createHookHandler(appConfig config.AppConfig) func(http.ResponseWriter, *http.Request) {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method != "POST" {
 			http.Error(writer, "invalid method", 405)
@@ -45,11 +46,14 @@ func createHookHandler(config config.AppConfig) func(http.ResponseWriter, *http.
 			return
 		}
 
-		token, exists := config.Matrix.Rooms[room]
-		if !exists {
+		otherRoomID := slices.IndexFunc(appConfig.Matrix.Rooms, func(otherRoom config.MatrixRoom) bool {
+			return otherRoom.ID == room
+		})
+		if otherRoomID == -1 {
 			http.Error(writer, "room not found", 404)
 			return
 		}
+		token := appConfig.Matrix.Rooms[otherRoomID].Token
 
 		var parsedRequest WebhookRequest
 		err := mapstructure.Decode(request.Form, &parsedRequest)

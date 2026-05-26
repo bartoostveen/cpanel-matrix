@@ -16,15 +16,3 @@ func OnSignal(handler func(), sig ...os.Signal) chan interface{} {
 	}()
 	return after
 }
-
-func KeysOf[V any](m map[string]V) []string {
-	keys := make([]string, len(m))
-
-	i := 0
-	for k := range m {
-		keys[i] = k
-		i++
-	}
-
-	return keys
-}
