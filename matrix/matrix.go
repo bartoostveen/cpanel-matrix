@@ -56,6 +56,8 @@ func InitMatrix(config config.MatrixConfig) {
 	}()
 
 	util.OnSignal(func() {
+		log.Infoln("Stopping Matrix sync")
+
 		cancelSync()
 		syncStopWait.Wait()
 	}, syscall.SIGTERM, syscall.SIGINT)

@@ -1,11 +1,15 @@
 package server
 
 import (
+	"context"
 	"crypto/subtle"
 	"fmt"
 	"net/http"
+	"os/signal"
 	"strconv"
 	"strings"
+	"sync"
+	"syscall"
 
 	"bartoostveen.nl/cpanel-matrix/config"
 	"bartoostveen.nl/cpanel-matrix/matrix"
@@ -24,13 +28,31 @@ type WebhookRequest struct {
 func Run(config config.AppConfig) {
 	log.Info("starting application")
 
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
 	matrix.InitMatrix(config.Matrix)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hook/{room}", createHookHandler(config))
 
+	server := http.Server{
+		Addr:    ":" + strconv.Itoa(config.Port),
+		Handler: mux,
+	}
+
 	log.Infof("server running on :%d", config.Port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), mux))
+
+	wg := sync.WaitGroup{}
+	wg.Go(func() {
+		<-ctx.Done()
+		_ = server.Shutdown(ctx)
+	})
+	wg.Go(func() {
+		err := server.ListenAndServe()
+		log.WithError(err).Fatal("failed to listen")
+	})
+	wg.Wait()
 }
 
 func createHookHandler(appConfig config.AppConfig) func(http.ResponseWriter, *http.Request) {
