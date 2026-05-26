@@ -25,10 +25,10 @@ matrix:
 ### Environment variables
 
 ```shell
-CPANEL_MATRIX_PORT=8080
-CPANEL_MATRIX_HOMESERVER_URL=https://matrix.example.com/
-CPANEL_MATRIX_ACCESS_TOKEN=verysecrettoken
-CPANEL_MATRIX_MX_ID=@bot:example.com
+CPANEL_PORT=8080
+CPANEL_HOMESERVER_URL=https://matrix.example.com/
+CPANEL_ACCESS_TOKEN=verysecrettoken
+CPANEL_MX_ID=@bot:example.com
 ```
 
 ## License

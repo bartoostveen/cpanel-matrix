@@ -5,19 +5,20 @@ import (
 	"fmt"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type AppConfig struct {
-	Port   int
-	Matrix MatrixConfig // separate interface so other code can refer to it
+	Port   int          `mapstructure:"port"`
+	Matrix MatrixConfig `mapstructure:"matrix"` // separate interface so other code can refer to it
 }
 
 type MatrixConfig struct {
 	HomeserverURL string            `mapstructure:"homeserver_url"`
 	AccessToken   string            `mapstructure:"access_token"`
 	MxID          string            `mapstructure:"mx_id"`
-	Rooms         map[string]string // room ID to token for particular room (TODO: improve?)
+	Rooms         map[string]string `mapstructure:"rooms"` // room ID to token for particular room (TODO: improve?)
 }
 
 func Load() (error, AppConfig) {
@@ -41,17 +42,20 @@ func Load() (error, AppConfig) {
 	if err := v.ReadInConfig(); err != nil {
 		// Only error if explicitly specified
 		if *configPath != "" {
-			return fmt.Errorf("failed to read config: %w", err), cfg
+			return err, cfg
 		}
+
+		log.WithError(err).Warn("Could not load config file, silently failing")
 	}
 
 	_ = v.BindEnv("port")
+
 	_ = v.BindEnv("matrix.homeserver_url")
 	_ = v.BindEnv("matrix.access_token")
 	_ = v.BindEnv("matrix.mx_id")
 	_ = v.BindEnv("matrix.rooms")
 
-	v.SetEnvPrefix("CPANEL_MATRIX")
+	v.SetEnvPrefix("CPANEL")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	v.AutomaticEnv()
