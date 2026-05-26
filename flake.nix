@@ -1,5 +1,5 @@
 {
-  description = "Simple, but beatiful Matrix webhook handler for cPanel notifications";
+  description = "Simple Matrix webhook handler for cPanel notifications";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";

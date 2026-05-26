@@ -1,6 +1,6 @@
 # cPanel Matrix webhook handler
 
-Simple, but beatiful Matrix webhook handler for cPanel notifications
+Simple Matrix webhook handler for cPanel notifications
 
 ## Compiling
 
