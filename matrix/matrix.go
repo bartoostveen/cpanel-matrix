@@ -121,7 +121,7 @@ func SendMatrixMessage(room string, subject string, hostname string, body string
 		log.WithError(err).Warn("Could not render message for Matrix!")
 		return
 	}
-	formatted = strings.ReplaceAll(formatted, "\n\n", "<br />")
+	formatted = strings.ReplaceAll(strings.TrimSpace(formatted), "\n", "<br />")
 
 	_, err = client.SendMessageEvent(ctx, id.RoomID(room), event.EventMessage, &event.MessageEventContent{
 		MsgType:       event.MsgNotice,
