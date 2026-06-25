@@ -1,4 +1,4 @@
-module bartoostveen.nl/cpanel-matrix
+module go.bartoostveen.nl/cpanel-matrix
 
 go 1.26.3
 

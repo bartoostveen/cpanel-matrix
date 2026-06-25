@@ -10,9 +10,9 @@ import (
 	"syscall"
 	textTemplate "text/template"
 
-	"bartoostveen.nl/cpanel-matrix/config"
-	"bartoostveen.nl/cpanel-matrix/util"
 	log "github.com/sirupsen/logrus"
+	"go.bartoostveen.nl/cpanel-matrix/config"
+	"go.bartoostveen.nl/cpanel-matrix/util"
 	"golang.org/x/exp/slices"
 	"golang.org/x/net/context"
 	"maunium.net/go/mautrix"

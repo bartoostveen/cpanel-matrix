@@ -11,8 +11,8 @@ import (
 	"sync"
 	"syscall"
 
-	"bartoostveen.nl/cpanel-matrix/config"
-	"bartoostveen.nl/cpanel-matrix/matrix"
+	"go.bartoostveen.nl/cpanel-matrix/config"
+	"go.bartoostveen.nl/cpanel-matrix/matrix"
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"

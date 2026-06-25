@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"bartoostveen.nl/cpanel-matrix/config"
-	"bartoostveen.nl/cpanel-matrix/server"
 	env "github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
+	"go.bartoostveen.nl/cpanel-matrix/config"
+	"go.bartoostveen.nl/cpanel-matrix/server"
 )
 
 func main() {
