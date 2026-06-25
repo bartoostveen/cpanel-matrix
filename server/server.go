@@ -11,10 +11,10 @@ import (
 	"sync"
 	"syscall"
 
-	"go.bartoostveen.nl/cpanel-matrix/config"
-	"go.bartoostveen.nl/cpanel-matrix/matrix"
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
+	"go.bartoostveen.nl/cpanel-matrix/config"
+	"go.bartoostveen.nl/cpanel-matrix/matrix"
 	"golang.org/x/exp/slices"
 )
 
