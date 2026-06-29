@@ -10,7 +10,7 @@ buildGoModule (finalAttrs: {
 
   src = ./.;
 
-  vendorHash = "sha256-IY20o8ch/WcJNSH1s2JgmdHIVYZykTri8G9TeMzKrUE=";
+  vendorHash = "sha256-h3F4wo9zTuSUOasP6oKYQavfORhRNqJrbEa1rH0MCkE=";
 
   meta = {
     description = "Simple, but beatiful Matrix webhook handler for cPanel notifications";
