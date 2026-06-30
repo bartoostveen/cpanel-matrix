@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - dev
+      - master
     paths:
       - "go.mod"
       - "go.sum"
@@ -33,7 +33,7 @@ jobs:
           set -euo pipefail
           branch="${FORGEJO_HEAD_REF:-$FORGEJO_REF_NAME}"
           git fetch origin "$branch"
-          git switch -c "$branch" --track "origin/$branch"
+          git switch "$branch" 2>/dev/null || git switch -c "$branch" --track "origin/$branch"
 
           echo "Updating vendor hashes"
           nix run nixpkgs#nix-update -- default -F --version=skip
