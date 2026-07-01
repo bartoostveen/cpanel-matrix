@@ -4,12 +4,16 @@ import (
 	"context"
 	"crypto/subtle"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
@@ -52,6 +56,56 @@ func Run(config config.AppConfig) {
 	wg.Go(func() {
 		err := server.ListenAndServe()
 		log.WithError(err).Fatal("failed to listen")
+	})
+	wg.Go(func() {
+		ticker := time.NewTicker(24 * time.Hour)
+		defer ticker.Stop()
+
+		cleanup := func() {
+			log.Info("removing 7 day old files...")
+			cutoff := time.Now().Add(-7 * 24 * time.Hour)
+
+			err := filepath.WalkDir(config.LogsDir, func(path string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+				if d.IsDir() {
+					return nil
+				}
+
+				info, err := d.Info()
+				if err != nil {
+					log.WithError(err).Warnf("failed to stat %s", path)
+					return nil
+				}
+
+				if info.ModTime().Before(cutoff) {
+					if err := os.Remove(path); err != nil {
+						log.WithError(err).Warnf("failed to remove %s", path)
+					} else {
+						log.Infof("deleted old log file %s", path)
+					}
+				}
+
+				return nil
+			})
+
+			if err != nil {
+				log.WithError(err).Warn("log cleanup failed")
+			}
+			log.Info("done cleaning up, sleeping for 7 days...")
+		}
+
+		cleanup()
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				cleanup()
+			}
+		}
 	})
 	wg.Wait()
 }
