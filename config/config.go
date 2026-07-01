@@ -10,8 +10,10 @@ import (
 )
 
 type AppConfig struct {
-	Port   int          `mapstructure:"port"`
-	Matrix MatrixConfig `mapstructure:"matrix"` // separate interface so other code can refer to it
+	Port    int          `mapstructure:"port"`
+	Matrix  MatrixConfig `mapstructure:"matrix"` // separate interface so other code can refer to it
+	LogsDir string       `mapstructure:"logs_dir"`
+	BaseUrl string       `mapstructure:"base_url"`
 }
 
 type MatrixConfig struct {
@@ -35,6 +37,7 @@ func Load() (error, AppConfig) {
 	v := viper.New()
 
 	v.SetDefault("port", 8080)
+	v.SetDefault("logs_dir", "logs")
 
 	if *configPath != "" {
 		v.SetConfigFile(*configPath)

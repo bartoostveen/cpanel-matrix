@@ -4,7 +4,7 @@ Simple Matrix webhook handler for cPanel notifications
 
 ## Compiling
 
-`go build bartoostveen.nl/cpanel-matrix/cmd/cpanel-matrix`
+`go build go.bartoostveen.nl/cpanel-matrix/cmd/cpanel-matrix`
 
 ## Setup
 

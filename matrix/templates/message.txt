@@ -1,2 +1,4 @@
 {{ if .Hostname }}[{{ .Hostname }}] {{ end }}**{{ .Subject }}**
 {{ .Body }}
+{{ if .Url }}
+Message truncated, you can view the full message here: {{ .Url }}{{ end }}

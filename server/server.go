@@ -35,6 +35,7 @@ func Run(config config.AppConfig) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hook/{room}", createHookHandler(config))
+	mux.Handle("/logs/", http.StripPrefix("/logs/", http.FileServer(http.Dir(config.LogsDir+"/"))))
 
 	server := http.Server{
 		Addr:    ":" + strconv.Itoa(config.Port),
@@ -104,7 +105,7 @@ func createHookHandler(appConfig config.AppConfig) func(http.ResponseWriter, *ht
 		if len(parsedRequest.Hostname) >= 1 {
 			hostname = parsedRequest.Hostname[0]
 		}
-		matrix.SendMatrixMessage(room, parsedRequest.Subject[0], hostname, parsedRequest.Body[0])
+		matrix.SendMatrixMessage(appConfig, room, parsedRequest.Subject[0], hostname, parsedRequest.Body[0])
 	}
 }
 

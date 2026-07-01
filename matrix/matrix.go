@@ -2,13 +2,17 @@ package matrix
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"embed"
 	"errors"
+	"fmt"
 	htmlTemplate "html/template"
+	"os"
 	"strings"
 	"sync"
 	"syscall"
 	textTemplate "text/template"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"go.bartoostveen.nl/cpanel-matrix/config"
@@ -91,13 +95,30 @@ type RenderRequest struct {
 	Subject  string
 	Hostname string
 	Body     string
+	Url      *string
 }
 
-func renderMatrixMessage(subject string, hostname string, body string) (err error, plain string, formatted string) {
+func renderMatrixMessage(cfg config.AppConfig, subject string, hostname string, body string) (err error, plain string, formatted string) {
+	lines := strings.Split(body, "\n")
+	var msg string
+	var url *string = nil
+
+	if len(lines) > 2 {
+		err, u := saveMessage(cfg, body)
+		if err != nil {
+			return err, "", ""
+		}
+		url = &u
+		msg = lines[0]
+	} else {
+		msg = body
+	}
+
 	req := RenderRequest{
 		Subject:  subject,
 		Hostname: hostname,
-		Body:     body,
+		Body:     msg,
+		Url:      url,
 	}
 
 	var plainResult bytes.Buffer
@@ -115,8 +136,20 @@ func renderMatrixMessage(subject string, hostname string, body string) (err erro
 	return
 }
 
-func SendMatrixMessage(room string, subject string, hostname string, body string) {
-	err, plain, formatted := renderMatrixMessage(subject, hostname, body)
+func saveMessage(cfg config.AppConfig, msg string) (err error, url string) {
+	_ = os.Mkdir(cfg.LogsDir, os.FileMode(0700))
+	fileName := fmt.Sprintf("%d-%x.txt", time.Now().UnixMilli(), sha256.Sum256([]byte(msg)))
+	err = os.WriteFile(cfg.LogsDir+"/"+fileName, []byte(msg), os.FileMode(0700))
+	if err != nil {
+		return
+	}
+
+	url = cfg.BaseUrl + "/logs/" + fileName
+	return
+}
+
+func SendMatrixMessage(cfg config.AppConfig, room string, subject string, hostname string, body string) {
+	err, plain, formatted := renderMatrixMessage(cfg, subject, hostname, body)
 	if err != nil {
 		log.WithError(err).Warn("Could not render message for Matrix!")
 		return

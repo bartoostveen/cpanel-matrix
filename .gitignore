@@ -6,6 +6,7 @@
 .idea/
 .gopath/
 /cpanel-matrix
+logs/
 *.env
 !.env.example
 config.yaml
