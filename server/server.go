@@ -93,7 +93,7 @@ func Run(config config.AppConfig) {
 			if err != nil {
 				log.WithError(err).Warn("log cleanup failed")
 			}
-			log.Info("done cleaning up, sleeping for 7 days...")
+			log.Info("done cleaning up, sleeping for 24 hours...")
 		}
 
 		cleanup()
