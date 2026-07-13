@@ -6,3 +6,5 @@ matrix:
   rooms:
     - id: "!roomidhere"
       token: "supersecrettoken"
+logs_dir: /var/log/cpanel-matrix
+log_retention_days: 7

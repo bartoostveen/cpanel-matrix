@@ -17,10 +17,12 @@ port: 8080
 matrix:
   homeserver_url: "https://matrix.example.com/"
   access_token: verysecrettoken
-  mx_id: ""@bot:example.com"
+  mx_id: "@bot:example.com"
   rooms:
     - id: "!roomidhere"
       token: "supersecrettoken"
+logs_dir: /var/log/cpanel-matrix
+log_retention_days: 7
 ```
 
 ### Environment variables

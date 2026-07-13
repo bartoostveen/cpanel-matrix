@@ -10,10 +10,11 @@ import (
 )
 
 type AppConfig struct {
-	Port    int          `mapstructure:"port"`
-	Matrix  MatrixConfig `mapstructure:"matrix"` // separate interface so other code can refer to it
-	LogsDir string       `mapstructure:"logs_dir"`
-	BaseUrl string       `mapstructure:"base_url"`
+	Port             int          `mapstructure:"port"`
+	Matrix           MatrixConfig `mapstructure:"matrix"` // separate interface so other code can refer to it
+	LogsDir          string       `mapstructure:"logs_dir"`
+	LogRetentionDays int64        `mapstructure:"log_retention_days"`
+	BaseUrl          string       `mapstructure:"base_url"`
 }
 
 type MatrixConfig struct {

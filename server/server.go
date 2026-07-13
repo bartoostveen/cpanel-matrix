@@ -62,8 +62,8 @@ func Run(config config.AppConfig) {
 		defer ticker.Stop()
 
 		cleanup := func() {
-			log.Info("removing 7 day old files...")
-			cutoff := time.Now().Add(-7 * 24 * time.Hour)
+			log.Infof("removing %d day old logs...", config.LogRetentionDays)
+			cutoff := time.Now().Add(-1 * time.Duration(config.LogRetentionDays) * 24 * time.Hour)
 
 			err := filepath.WalkDir(config.LogsDir, func(path string, d fs.DirEntry, err error) error {
 				if err != nil {
