@@ -35,6 +35,9 @@ jobs:
           git fetch origin "$branch"
           git switch "$branch" 2>/dev/null || git switch -c "$branch" --track "origin/$branch"
 
+          echo "Running go mod tidy"
+          nix develop --command bash -c 'go mod tidy'
+
           echo "Updating vendor hashes"
           nix run nixpkgs#nix-update -- default -F --version=skip
 
