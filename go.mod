@@ -9,7 +9,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597
 	golang.org/x/net v0.57.0
-	maunium.net/go/mautrix v0.28.1
+	maunium.net/go/mautrix v0.29.0
 )
 
 require (
@@ -30,7 +30,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
-	go.mau.fi/util v0.9.10 // indirect
+	go.mau.fi/util v0.9.11 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
