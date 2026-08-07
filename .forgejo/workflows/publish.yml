@@ -108,6 +108,8 @@ jobs:
         run: |
           curl --fail-with-body \
             -X PUT \
-            -H "Authorization: bearer ${{ steps.jwt.outputs.jwt }}" \
+            -H "Authorization: token $TOKEN" \
             --upload-file "${{ steps.test.outputs.path }}" \
             "${{ forge.server_url }}/api/packages/${{ github.repository_owner }}/debian/pool/${{ matrix.distro }}/stable/upload"
+        env:
+          TOKEN: "${{ secrets.PACKAGE_TOKEN }}"
