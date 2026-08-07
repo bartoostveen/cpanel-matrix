@@ -6,7 +6,7 @@ After=network-online.target
 Type=simple
 DynamicUser=yes
 EnvironmentFile=-/etc/default/cpanel-matrix
-ExecStart=/usr/bin/cpanel-matrix -config /etc/cpanel-matrix/config.yaml
+ExecStart=/usr/bin/cpanel-matrix -c /etc/cpanel-matrix/config.yaml
 Restart=always
 RestartSec=5
 
