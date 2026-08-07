@@ -21,12 +21,14 @@ jobs:
         run: |
           mkdir -p dist/release
           cp -L --no-preserve --all result/bin/cpanel-matrix dist/release/${FORGEJO_REPOSITORY##*/}-${FORGEJO_REF_NAME}
+          nix run .#get-changelog > dist/CHANGELOG.md
       - name: create release
         id: release
         uses: bart/forgejo-release@74bd5d3064257c896a1499ddcf18ac1161189d47 # v2
         with:
           direction: upload
           gpg-private-key: ${{ secrets.GPG_PRIVKEY }}
+          notes-file: CHANGELOG.md
   build-deb:
     needs: release
     runs-on: ubuntu-latest
@@ -56,6 +58,8 @@ jobs:
           cpanel-matrix (${VERSION}-1) ${{ matrix.distro }}; urgency=low
 
             * Automated release build for Debian ${{ matrix.distro }}.
+            * See CHANGELOG.md in release assets for full changelog.
+            * See also: <https://git.bartoostveen.nl/bart/cpanel-matrix/src/tag/v${VERSION}/CHANGELOG.md>
 
            -- ${{ github.actor }} <git@bartoostveen.nl>  $(date -R)
 

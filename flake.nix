@@ -50,6 +50,28 @@
                 towncrier build --version "${self'.packages.default.version}" --yes "$@"
               '';
             };
+            get-changelog = pkgs.writeShellApplication {
+              name = "get-changelog";
+              runtimeInputs = [
+                pkgs.coreutils
+                pkgs.git
+              ];
+              text = ''
+                git diff HEAD~ HEAD -- CHANGELOG.md | grep '^[+]' | sed 's/^+//' | tail -n +3
+              '';
+            };
+            tag-release = pkgs.writeShellApplication {
+              name = "tag-release";
+              runtimeInputs = [
+                pkgs.git
+                self'.packages.towncrier-build
+              ];
+              text = ''
+                towncrier-build
+                git commit -m "chore: Release ${self'.packages.default.version}"
+                git tag 'v${self'.packages.default.version}' -m "Release ${self'.packages.default.version}"
+              '';
+            };
           };
 
           devShells.default = pkgs.mkShell {
