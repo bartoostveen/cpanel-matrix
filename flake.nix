@@ -25,7 +25,7 @@
       ];
 
       perSystem =
-        { pkgs, ... }:
+        { pkgs, self', ... }:
 
         {
           treefmt = {
@@ -33,7 +33,17 @@
             programs.gofmt.enable = true;
           };
 
-          packages.default = pkgs.callPackage ./package.nix { };
+          packages = {
+            default = pkgs.callPackage ./package.nix { };
+            cpanel-matrix = self'.packages.default;
+            static = self'.packages.default.overrideAttrs {
+              GCO_ENABLED = 0;
+              ldflags = [
+                "-linkmode external"
+                "-extldflags '-static -L${pkgs.glibc.static}/lib'"
+              ];
+            };
+          };
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [

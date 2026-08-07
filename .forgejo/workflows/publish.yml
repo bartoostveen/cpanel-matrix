@@ -16,7 +16,7 @@ jobs:
           gpg-privkey: ${{ secrets.GPG_PRIVKEY }}
           gpg-key-id: ${{ vars.GPG_KEY_ID }}
       - name: build
-        run: nix build .#
+        run: nix build .#static
       - name: create archive
         run: |
           mkdir -p dist/release
