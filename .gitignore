@@ -11,3 +11,13 @@ logs/
 !.env.example
 config.yaml
 sync_state.json
+
+debian/*.debhelper
+debian/*.substvars
+debian/files
+debian/cpanel-matrix/
+debian/.debhelper/
+obj-*/
+*.deb
+*.log
+**/*/debhelper-build-stamp

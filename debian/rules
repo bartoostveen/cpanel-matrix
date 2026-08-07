@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+export CGO_ENABLED=0
+
+%:
+	dh $@ --buildsystem=golang
+
+override_dh_auto_build:
+	go build -trimpath -ldflags="-s -w" -o cpanel-matrix cmd/cpanel-matrix/main.go
+
+override_dh_auto_install:
+	install -Dm755 cpanel-matrix debian/cpanel-matrix/usr/bin/cpanel-matrix
+
+override_dh_auto_test:
+	@echo "Skipping tests during package build"
+
+override_dh_auto_clean:
+	rm -f cpanel-matrix
+
+override_dh_installinit:
+	dh_installinit --no-start
+	dh_installsystemd

@@ -1,0 +1,18 @@
+[Unit]
+Description=cPanel Matrix Webhook Handler
+After=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+EnvironmentFile=-/etc/default/cpanel-matrix
+ExecStart=/usr/bin/cpanel-matrix -config /etc/cpanel-matrix/config.yaml
+Restart=always
+RestartSec=5
+
+WorkingDirectory=/var/lib/cpanel-matrix
+StateDirectory=cpanel-matrix
+LogsDirectory=cpanel-matrix
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+Source: cpanel-matrix
+Section: utils
+Priority: optional
+Maintainer: Bart Oostveen <bart@bartoostveen.nl>
+Build-Depends: debhelper-compat (= 13), golang-go (>= 1.20)
+Standards-Version: 4.6.2
+Homepage: https://git.bartoostveen.nl/bart/cpanel-matrix
+
+Package: cpanel-matrix
+Architecture: any
+Depends: ${misc:Depends}
+Description: Simple, but beatiful Matrix webhook handler for cPanel
+ notifications.
