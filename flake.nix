@@ -68,8 +68,10 @@
               ];
               text = ''
                 towncrier-build
+                git add .
                 git commit -m "chore: Release ${self'.packages.default.version}"
                 git tag 'v${self'.packages.default.version}' -m "Release ${self'.packages.default.version}"
+                git show
               '';
             };
           };
@@ -79,6 +81,7 @@
               go
               gopls
               python314Packages.towncrier
+              self'.packages.tag-release
             ];
 
             shellHook = ''
