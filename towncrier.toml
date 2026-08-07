@@ -1,0 +1,4 @@
+[tool.towncrier]
+name = "cpanel-matrix"
+directory = "changelog.d"
+filename = "CHANGELOG.md"

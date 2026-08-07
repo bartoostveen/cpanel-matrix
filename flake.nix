@@ -43,12 +43,20 @@
                 "-extldflags '-static -L${pkgs.glibc.static}/lib'"
               ];
             };
+            towncrier-build = pkgs.writeShellApplication {
+              name = "towncrier-build";
+              runtimeInputs = [ pkgs.python314Packages.towncrier ];
+              text = ''
+                towncrier build --version "${self'.packages.default.version}" --yes "$@"
+              '';
+            };
           };
 
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               go
               gopls
+              python314Packages.towncrier
             ];
 
             shellHook = ''
