@@ -4,13 +4,15 @@ on:
     tags:
       - "v*"
 
+enable-openid-connect: true
+
 jobs:
   release:
     runs-on: [gpg, native-x86_64-linux]
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 2 # For release note generation
       - uses: actions/setup-home@972508aa672ab101fd85eaffab9671c0a641bc7a # v1
         with:
           gpg-privkey: ${{ secrets.GPG_PRIVKEY }}
@@ -20,39 +22,61 @@ jobs:
       - name: create archive
         run: |
           mkdir -p dist/release
-          cp -L --no-preserve --all result/bin/cpanel-matrix dist/release/${FORGEJO_REPOSITORY##*/}-${FORGEJO_REF_NAME}
+          cp -L --no-preserve all result/bin/cpanel-matrix dist/release/${FORGEJO_REPOSITORY##*/}-${FORGEJO_REF_NAME}
           nix run .#get-changelog > dist/CHANGELOG.md
+          echo "Changelogs:"
+          echo
+          cat dist/CHANGELOG.md
       - name: create release
         id: release
         uses: bart/forgejo-release@74bd5d3064257c896a1499ddcf18ac1161189d47 # v2
         with:
           direction: upload
           gpg-private-key: ${{ secrets.GPG_PRIVKEY }}
-          notes-file: CHANGELOG.md
+          release-notes-file: dist/CHANGELOG.md
   build-deb:
     needs: release
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, bigger-parallel]
     strategy:
       matrix:
-        distro: [bookworm, trixie, sid]
+        distro: [trixie, sid]
+        arch: [amd64]
     container:
       image: debian:${{ matrix.distro }}-slim
-    permissions:
-      packages: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          path: "${{ github.event.repository.name }}-${{ github.ref_name }}"
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y build-essential debhelper dh-golang golang-go git curl
+          apt-get install -y build-essential debhelper dh-golang golang-go git curl nodejs jq
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: "${{ github.event.repository.name }}-${{ github.ref_name }}"
+      - name: fetch jwt
+        id: jwt
+        env:
+          AUD: u:1:6f69d037-1ea7-4fc6-89e5-86d9ef1fe766
+        run: |
+          jwt=$( \
+            curl --fail \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$AUD" \
+            | jq -r ".value" \
+          )
+          # ::add-mask:: tells Forgejo Runner that the JWT
+          # is a secret which should be masked in the logs.
+          echo "::add-mask::$jwt"
+          echo "jwt=$jwt" >> $FORGEJO_OUTPUT
       - name: Build Debian package
         run: |
           pushd "$SOURCE_PACKAGE_DIR"
 
+          GO_VERSION=$(go version | awk '{print $3}' | sed 's/go//' | cut -d. -f1,2)
+          echo "Detected Go version in container: $GO_VERSION"
+
+          sed -i "s/^go [0-9.]*/go $GO_VERSION/" go.mod
+
           VERSION=${FORGEJO_REF_NAME#v}
-          echo "Appending version $VERSION to Debian changelo for ${{ matrix.distro }}"
+          echo "Appending version $VERSION to Debian changelog for ${{ matrix.distro }}"
 
           cat << EOF > debian/changelog.new
           cpanel-matrix (${VERSION}-1) ${{ matrix.distro }}; urgency=low
@@ -72,15 +96,18 @@ jobs:
         env:
           SOURCE_PACKAGE_DIR: "${{ github.event.repository.name }}-${{ github.ref_name }}"
       - name: Test Debian package
+        id: test
         run: |
           DEB_FILE=$(ls *.deb | head -n 1)
           apt-get install -y ./$DEB_FILE
           cpanel-matrix --help || true
           ls -la /etc/cpanel-matrix/config.yaml
           ls -la /lib/systemd/system/cpanel-matrix.service
+          echo "path=$DEB_FILE" >> $GITHUB_OUTPUT
       - name: Upload Debian package to Forgejo registry
         run: |
-          DEB_FILE=$(ls *.deb | head -n 1)
-          curl --user "${FORGEJO_REPOSITORY%/*}:${FORGEJO_TOKEN}" \
-            --upload-file "${DEB_FILE}" \
-            "${FORGEJO_API_URL}/packages/${FORGEJO_REPOSITORY%/*}/debian/pool/${{ matrix.distro }}/main/upload"
+          curl --fail-with-body \
+            -X PUT \
+            -H "Authorization: bearer ${{ steps.jwt.outputs.jwt }}" \
+            --upload-file "${{ steps.test.outputs.path }}" \
+            "${{ forge.server_url }}/api/packages/${{ github.repository_owner }}/debian/pool/${{ matrix.distro }}/stable/upload"

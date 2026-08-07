@@ -20,4 +20,5 @@ debian/.debhelper/
 obj-*/
 *.deb
 *.log
+!debian/config.yaml
 **/*/debhelper-build-stamp
