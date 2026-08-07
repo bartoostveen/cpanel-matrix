@@ -47,7 +47,8 @@
               name = "towncrier-build";
               runtimeInputs = [ pkgs.python314Packages.towncrier ];
               text = ''
-                towncrier build --version "${self'.packages.default.version}" --yes "$@"
+                version=$(nix eval --raw .#default.version)
+                towncrier build --version "$version" --yes "$@"
               '';
             };
             get-changelog = pkgs.writeShellApplication {
@@ -68,9 +69,10 @@
               ];
               text = ''
                 towncrier-build
+                version=$(nix eval --raw .#default.version)
                 git add .
-                git commit -m "chore: Release ${self'.packages.default.version}"
-                git tag 'v${self'.packages.default.version}' -m "Release ${self'.packages.default.version}"
+                git commit -m "chore: Release $version"
+                git tag "v$version" -m "Release $version"
                 git show
               '';
             };
