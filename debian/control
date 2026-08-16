@@ -9,5 +9,4 @@ Homepage: https://git.bartoostveen.nl/bart/cpanel-matrix
 Package: cpanel-matrix
 Architecture: any
 Depends: ${misc:Depends}
-Description: Simple, but beatiful Matrix webhook handler for cPanel
- notifications.
+Description: Simple Matrix webhook handler for cPanel notifications
