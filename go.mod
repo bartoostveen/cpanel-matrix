@@ -1,6 +1,6 @@
 module go.bartoostveen.nl/cpanel-matrix
 
-go 1.25.0
+go 1.26.0
 
 toolchain go1.26.5
 
@@ -9,7 +9,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/sirupsen/logrus v1.10.1
 	github.com/spf13/viper v1.21.0
-	golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297
+	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa
 	golang.org/x/net v0.58.0
 	maunium.net/go/mautrix v0.30.0
 )
