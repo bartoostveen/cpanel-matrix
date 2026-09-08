@@ -10,7 +10,7 @@ require (
 	github.com/sirupsen/logrus v1.10.2
 	github.com/spf13/viper v1.21.0
 	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa
-	golang.org/x/net v0.58.0
+	golang.org/x/net v0.59.0
 	maunium.net/go/mautrix v0.30.0
 )
 
@@ -33,7 +33,7 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	go.mau.fi/util v0.10.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/crypto v0.55.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.41.0 // indirect
+	golang.org/x/crypto v0.57.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/text v0.42.0 // indirect
 )
