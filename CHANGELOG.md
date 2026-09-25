@@ -4,6 +4,13 @@ Simple Matrix webhook handler for cPanel notifications.
 
 <!-- towncrier release notes start -->
 
+# cpanel-matrix 1.0.4 (2026-09-25)
+
+## Misc
+
+- Updated golang to 1.27.1
+
+
 # cpanel-matrix 1.0.3 (2026-08-30)
 
 ## Bugfixes

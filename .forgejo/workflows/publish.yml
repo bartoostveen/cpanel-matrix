@@ -48,6 +48,11 @@ jobs:
         run: |
           apt-get update
           apt-get install -y build-essential debhelper dh-golang golang-go git curl nodejs jq
+      # TODO: remove (https://github.com/podman-container-tools/podman/issues/29805)
+      - name: Fix /var/run symlink for Podman
+        run: |
+          rm -f /var/run
+          mkdir -p /var/run
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           path: "${{ github.event.repository.name }}-${{ github.ref_name }}"

@@ -6,7 +6,7 @@
 
 buildGoModule (finalAttrs: {
   pname = "cpanel-matrix";
-  version = "1.0.3";
+  version = "1.0.4";
 
   src = ./.;
 
