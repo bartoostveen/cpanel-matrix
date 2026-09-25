@@ -27,6 +27,10 @@
       perSystem =
         { pkgs, self', ... }:
 
+        let
+          go = pkgs.go_1_27;
+          buildGoModule = pkgs.buildGo127Module;
+        in
         {
           treefmt = {
             programs.nixfmt.enable = true;
@@ -34,7 +38,12 @@
           };
 
           packages = {
-            default = pkgs.callPackage ./package.nix { };
+            default = pkgs.callPackage ./package.nix {
+              inherit
+                go
+                buildGoModule
+                ;
+            };
             cpanel-matrix = self'.packages.default;
             static = self'.packages.default.overrideAttrs {
               GCO_ENABLED = 0;
@@ -79,10 +88,10 @@
           };
 
           devShells.default = pkgs.mkShell {
-            packages = with pkgs; [
+            packages = [
               go
-              gopls
-              python314Packages.towncrier
+              pkgs.gopls
+              pkgs.python314Packages.towncrier
               self'.packages.tag-release
             ];
 
