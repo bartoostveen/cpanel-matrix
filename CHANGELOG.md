@@ -4,6 +4,13 @@ Simple Matrix webhook handler for cPanel notifications.
 
 <!-- towncrier release notes start -->
 
+# cpanel-matrix 1.0.6 (1980-01-01)
+
+## Misc
+
+- #57
+
+
 # cpanel-matrix 1.0.5 (2026-10-17)
 
 ## Misc
