@@ -2,7 +2,7 @@ module go.bartoostveen.nl/cpanel-matrix
 
 go 1.27.0
 
-toolchain go1.27.2
+toolchain go1.27.3
 
 require (
 	github.com/joho/godotenv v1.5.1
