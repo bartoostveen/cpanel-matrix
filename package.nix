@@ -1,7 +1,6 @@
 {
   buildGoModule,
   lib,
-  ...
 }:
 
 buildGoModule (finalAttrs: {

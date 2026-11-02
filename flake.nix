@@ -40,7 +40,6 @@
           packages = {
             default = pkgs.callPackage ./package.nix {
               inherit
-                go
                 buildGoModule
                 ;
             };
