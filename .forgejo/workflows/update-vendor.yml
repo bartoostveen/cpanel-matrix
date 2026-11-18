@@ -39,6 +39,7 @@ jobs:
           nix develop --command bash -c 'go mod tidy'
 
           echo "Updating vendor hashes"
+          nix flake archive
           nix run nixpkgs#nix-update -- default -F --version=skip
 
           if git diff --quiet --exit-code; then
